@@ -107,7 +107,7 @@ export default DynamicDomainForm
 
 export const formatDomainError = (count: number) => {
   return Array.from({ length: count }).reduce((prev: any, _, idx) => {
-    const key = `domains.${idx}.value`
+    const key = `Domain${idx}`
     return {
       ...prev,
       [key]: [

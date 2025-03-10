@@ -66,7 +66,11 @@ import { useId, useNamespace } from '@element-plus/hooks'
 import { useFormSize } from './hooks'
 import { formItemProps } from './form-item'
 import FormLabelWrap from './form-label-wrap'
-import { formContextKey, formItemContextKey } from './constants'
+import {
+  formContextKey,
+  formItemContextKey,
+  formValidatorMessagesKey,
+} from './constants'
 
 import type { CSSProperties } from 'vue'
 import type { RuleItem } from 'async-validator'
@@ -158,6 +162,8 @@ const validateClasses = computed(() => [
 ])
 
 const propString = computed(() => {
+  if (props.label) return props.label
+
   if (!props.prop) return ''
   return isString(props.prop) ? props.prop : props.prop.join('.')
 })
@@ -282,11 +288,16 @@ const onValidationSucceeded = () => {
   formContext?.emit('validate', props.prop!, true, '')
 }
 
+const validatorMessage = inject(formValidatorMessagesKey)
+
 const doValidate = async (rules: RuleItem[]): Promise<true> => {
   const modelName = propString.value
   const validator = new AsyncValidator({
     [modelName]: rules,
   })
+
+  validator.messages(validatorMessage)
+
   return validator
     .validate({ [modelName]: fieldValue.value }, { firstFields: true })
     .then(() => {
